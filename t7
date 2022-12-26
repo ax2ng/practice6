@@ -1,0 +1,75 @@
+# Реализовать расчет карточки лицевого счета в сбербанке при различных годовых
+# процентах. Начисления производятся при каждой операции пропорционально времени
+# между операциями. Реализовать операции поступления и снятия произвольной суммы.
+# Выполнить сортировку списка. ВАРИАНТ 4
+
+
+from tabulate import tabulate
+
+def write_csv(headers: list, data: list) -> None:
+    """
+    Записывает данные в CSV файл и выводит
+    структурированные данные, введенные пользователем
+
+    :param headers: - Заголовки выводимой таблицы
+    :param data: - Пользовательские данные
+    """
+    print(tabulate(data, headers, tablefmt="таблица"))
+    text = ""
+    for i in data:
+        text += ','.join([str(y) for y in i])+'\n'
+        #заджоинил запятые в итератор :))))))
+    open('file.csv', 'w').write(text)
+
+def get_card() -> tuple:
+    """
+    Возвращает карту пользователя
+    :return tuple:
+    """
+    while True:
+        try:
+            balance = float(input("Баланс: "))
+            percents = float(input("Годовые: "))
+        except ValueError:
+            continue #перешел на новую итерацию цикла досрочно
+        return balance, percents
+
+def add_money(карта: tuple, count: float) -> tuple:
+    """
+    Добавляект немного бабла на твой нищенский счет
+
+    :param карта:
+    :param count:
+    :return:
+    """
+    карта = ((count + карта[0] * (1 + карта[1] / 100), карта[1]))
+    return карта
+
+def get_money(карта: tuple, count: float):
+    """
+
+    :param карта:
+    :param count:
+    :return:
+    """
+    карта = ((карта[0] * (1 + карта[1] / 100) - count), карта[1])
+    return карта
+
+def start():
+    card = get_card()
+
+    while True:
+        operation = input("Операция (- или +): ")
+        try:
+            count = int(input("Количество денег: "))
+        except ValueError:
+            continue
+        if operation == "-":
+            card = get_money(card,count)
+        else:
+            card = add_money(card,count)
+        print(card)
+        print(write_csv(["Баланс", "Годовые"], [card]))
+
+if __name__ == "__main__":
+    start()
