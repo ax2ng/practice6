@@ -7,7 +7,7 @@ from tabulate import tabulate
 import csv
 
 
-def csv(headers: list, data: list):
+def write_csv(headers: list, data: list) -> None:  # функция ничего не возвращает
     """
     Записывает данные в CSV файл и выводит
     структурированные данные, введенные пользователем
@@ -15,20 +15,21 @@ def csv(headers: list, data: list):
     :param headers: - Заголовки выводимой таблицы
     :param data: - Пользовательские данные
     """
-    print(tabulate(data,headers,tablefmt="таблица"))
+    print(tabulate(data, headers, tablefmt="grid"))  # grid - стиль отображения таблички
     text = ""
     for i in data:
-        text += ','.join(map(str, i)) + '\n' #делает строку, джойним запятые в итерируемый объект
-    open('file.csv', 'w').write(text)
+        text += ','.join(map(str, i)) + '\n'  # join соединяет элементы списка в строку, \n для перевода строки
+    open('file.csv', 'w').write(text)  # open открывает файл для записи
+
 
 def worker(num: int) -> tuple:
     """
-    Функцоя которая создает работника
+    Функцbя которая создает работника
 
     :param num:
     :return tuple:
     """
-    print("Работник №",num,sep="")
+    print("Работник №", num, sep="")  # sep добавляет разделитель между строками для печати.
     surname = input("Фамилия: ")
     year = input("Год рождения: ")
     dolj = input("Должность: ")
@@ -39,9 +40,10 @@ def worker(num: int) -> tuple:
         except:
             pass
     obr = input("Образование: ")
-    return (surname,year,dolj,staj,obr)
+    return (surname, year, dolj, staj, obr)
 
-def start():
+
+def start() -> None:
     while True:
         try:
             count = int(input("Количество работников: "))
@@ -49,23 +51,26 @@ def start():
         except:
             pass
 
-    workers = []
+    workers = []  # создаем списки
     vysh_obr = []
     for i in range(count):
-        workers.append(worker(i+1))
+        workers.append(worker(i + 1))  # добавляем в списки элементы
 
     for i in workers:
-        if i[4].lower() == "высшее" and i[2].lower() == "мастер":
+        if i[4].lower() == "высшее" and i[2].lower() == "мастер":  # преобразование строки в нижний регистр
             vysh_obr.append(i)
     try:
         print("Средний стаж работников с высшим: ", sum([i[3] for i in vysh_obr]) / len(vysh_obr))
+        # sum суммирует список числовых значений, len возвращает количество элементов в обьекте
     except:
         pass
 
     print("\nСортировка по стажу:")
-    csv(["Фамилия", "Год рождения", "Должность", "Стаж", "Образование"], sorted(workers, key=lambda x: x[3], reverse=True))
-    #  лямбда функции нужна для того, чтобы фильровать по третьему элементу
+    write_csv(["Фамилия", "Год рождения", "Должность", "Стаж", "Образование"],
+              sorted(workers, key=lambda x: x[3], reverse=True))
+# сортирует в обр.порядке
+#  лямбда функции нужна для того, чтобы фильровать по третьему элементу
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # позволяет разделить код, который будет выполняться
     start()
