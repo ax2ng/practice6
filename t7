@@ -5,8 +5,10 @@
 
 
 from tabulate import tabulate
+import csv
 
-def write_csv(headers: list, data: list) -> None:
+
+def write_csv(headers: list, data: list) -> None:  # функция ничего не возвращает
     """
     Записывает данные в CSV файл и выводит
     структурированные данные, введенные пользователем
@@ -14,12 +16,13 @@ def write_csv(headers: list, data: list) -> None:
     :param headers: - Заголовки выводимой таблицы
     :param data: - Пользовательские данные
     """
-    print(tabulate(data, headers, tablefmt="таблица"))
+    print(tabulate(data, headers, tablefmt='grid'))  # grid - стиль отображения таблички
     text = ""
     for i in data:
-        text += ','.join([str(y) for y in i])+'\n'
-        #заджоинил запятые в итератор :))))))
-    open('file.csv', 'w').write(text)
+        text += ','.join([str(y) for y in i]) + '\n'  # join соединяет элементы списка в строку, \n для перевода строки
+        # заджоинил запятые в итератор :))))))
+    open('file.csv', 'w').write(text)  # open открывает файл для записи
+
 
 def get_card() -> tuple:
     """
@@ -30,32 +33,35 @@ def get_card() -> tuple:
         try:
             balance = float(input("Баланс: "))
             percents = float(input("Годовые: "))
-        except ValueError:
-            continue #перешел на новую итерацию цикла досрочно
+        except ValueError:  # исключает функцию которая получает аргумент правильного типа, но некорректного значения.
+            continue  # перешел на новую итерацию цикла досрочно
         return balance, percents
 
-def add_money(карта: tuple, count: float) -> tuple:
-    """
-    Добавляект немного бабла на твой нищенский счет
 
-    :param карта:
+def add_money(card: tuple, count: float) -> tuple:  # функция возвращает карту
+    """
+    Добавляет деньги на счет
+
+    :param card: кортеж
     :param count:
     :return:
     """
-    карта = ((count + карта[0] * (1 + карта[1] / 100), карта[1]))
-    return карта
+    card = (count + card[0] * (1 + card[1] / 100), card[1])
+    return card
 
-def get_money(карта: tuple, count: float):
+
+def get_money(card: tuple, count: float) -> tuple:
     """
 
-    :param карта:
+    :param card:
     :param count:
     :return:
     """
-    карта = ((карта[0] * (1 + карта[1] / 100) - count), карта[1])
-    return карта
+    card = ((card[0] * (1 + card[1] / 100) - count), card[1])
+    return card
 
-def start():
+
+def start() -> None:
     card = get_card()
 
     while True:
@@ -65,11 +71,12 @@ def start():
         except ValueError:
             continue
         if operation == "-":
-            card = get_money(card,count)
+            card = get_money(card, count)
         else:
-            card = add_money(card,count)
+            card = add_money(card, count)
         print(card)
         print(write_csv(["Баланс", "Годовые"], [card]))
 
-if __name__ == "__main__":
+
+if __name__ == "__main__":  # позволяет разделить код, который будет выполняться
     start()
