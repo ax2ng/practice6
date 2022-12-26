@@ -1,0 +1,309 @@
+import csv
+from tabulate import tabulate
+
+
+def MainMenu():
+    """
+    меню для авторизации и регистрации
+    :return:
+    """
+    print("Авторизация:")
+    userOptions = int(input("1 - Войти\n" "2 - Регистрация\n" "3 - Выйти из программы\n"))
+    if userOptions == 1:
+        UserAutorized()
+    if userOptions == 2:
+        UserRegistration()
+    if userOptions == 3 and userOptions == 7:
+        exit(0)
+
+
+def UserAutorized():
+    """
+    Авторизация пользователя
+    :return:
+    """
+    UserFile = 'UserBase.csv'
+    try:
+        with open(UserFile) as csvFile:
+            csvRead = csv.reader(csvFile)
+            userLogin = input("Введите логин: ")
+            userPassword = input("Введите пароль: ")
+            userRole = "admin"
+            i = 0
+            for data in csvRead:
+                if userLogin == str(data[0]) and userPassword == str(data[1]) and userRole != str(data[2]):
+                    SelectMenu(userLogin)
+                    i = 1
+                elif userLogin == str(data[0]) and userPassword == str(data[1]) and userRole == str(data[2]):
+                    AdminMenu(userLogin)
+                    i = 1
+            if not i:
+                print("Неверный пароль или логин!")
+                MainMenu()
+                return
+        csvFile.close()
+    except RecursionError as error:  # Исключение, возникающее в случае обнаружения рекурсивного вызова.
+        print("Неправильный пароль или логин!")
+        print(error)
+        UserAutorized()
+
+
+def SelectMenu(nameUser: dict):
+    """
+    Меню пользователя
+    :param nameUser:
+    :return:
+    """
+    userOptions = int(input("1 - Список товаров\n" "2 - Выйти из программы\n"))
+    if userOptions == 1:
+        Data(nameUser)
+    if userOptions == 2:
+        exit(0)
+    else:
+        print("Такой команды несуществует!")
+        SelectMenu(nameUser)
+
+
+def UserRegistration():
+    """
+    Регистрация пользователя
+    :return:
+    """
+    with open('UserBase.csv') as save:
+        users = save.read()
+        try:
+            userLogin = input("Введите логин: ")
+            userPassword = input("Введите пароль: ")
+            userPasswordA = input("Повторите ввод пароля: ")
+            userRole = "user"
+            if userPassword == userPasswordA:
+                with open("UserBase.csv", 'w') as f:
+                    users += f"\n{userLogin},{userPasswordA},{userRole}"
+                    f.write(users)
+                print("Успешно!")
+                MainMenu()
+            else:
+                print("Вы ввели неодинаковый пароль..Повторите ввод!")
+                UserRegistration()
+        except AttributeError:
+            print("Введите название без символов")
+        MainMenu()
+
+
+def AdminMenu(nameUser):
+    """
+    Панель администратора, выполнена по критерию CRUD(доб, чит, ред, удал) + добавлены функции с товарами
+    :param nameUser:
+    :return:
+    """
+    print("Вы вошли под аккаунтом админа.")
+    print(
+        "1 - Все пользователи\n" "2 - Добавить пользователя\n" "3 - Удалить пользователя\n"
+        "4 - Товары на складе\n" "5 - Добавить товар\n" "6 - Удалить товар\n" "7 - Выйти из программы")
+    print(f"Ваш логин: {nameUser}")
+    userOptions = int(input("Введите: "))
+    if userOptions == 1:
+        userData = 'UserBase.csv'
+        try:
+            with open(userData) as save:
+                csvRead = csv.reader(save)
+                i = 1
+                baseList = {}
+                for base in csvRead:
+                    tablHeaders = ["Логин", "Пароль", "Роль"]
+                    tablBase = base[0], base[1], base[2]
+                    baseList[i] = (tablBase)
+                    i += 1
+                listBase = []
+                for key, value in baseList.items():
+                    for i in value:
+                        listBase.append([*i])
+                print(tabulate(baseList.values(), tablHeaders, tablefmt="pipe"))
+                save.close()
+                AdminMenu(nameUser)
+        except:
+            print("Файл отсутствует")
+    if userOptions == 2:
+        AddUser(nameUser)
+    if userOptions == 3:
+        DelUser(nameUser)
+    if userOptions == 4:
+        Data = 'DataSklad.csv'
+        try:
+            with open(Data) as save:
+                csvRead = csv.reader(save)
+                i = 1
+                baseList = {}
+                for base in csvRead:
+                    tablHeaders = ["Наименование", "Цена", "Количество"]
+                    tablBase = base[0], base[1], base[2]
+                    baseList[i] = (tablBase)
+                    i += 1
+                listBase = []
+                for key, value in baseList.items():
+                    for i in value:
+                        listBase.append([*i])
+                print(tabulate(baseList.values(), tablHeaders, tablefmt="pipe"))
+                save.close()
+                AdminMenu(nameUser)
+        except:
+            print("Файл отсутствует")
+    if userOptions == 5:
+        AddDataSklad(nameUser)
+    if userOptions == 6:
+        DelBase(nameUser)
+    if userOptions == 7:
+        exit(0)
+    else:
+        print("Такой команды несуществует!")
+        AdminMenu(nameUser)
+
+
+def Data(nameUser: dict):
+    """
+    Вывод товара
+    :param nameUser:
+    :return:
+    """
+    userDataFile = 'DataSklad.csv'
+    try:
+        with open(userDataFile) as save:
+            csvRead = csv.reader(save)
+            next(csvRead)
+            i = 1
+            baseList = {}
+            for baseUser in csvRead:
+                tablHeaders = ["Наименование", "Цена", "Количество"]
+                tablBase = baseUser[0], baseUser[1], baseUser[2]
+                baseList[i] = (tablBase)
+                i += 1
+            listBase = []
+            for key, value in baseList.items():
+                for i in value:
+                    listBase.append([*i])
+            print(tabulate(baseList.values(), tablHeaders, tablefmt="pipe"))
+            save.close()
+            SelectMenu(nameUser)
+    except:
+        print("Файл отсутствует")
+
+
+def AddDataSklad(nameUser):
+    """
+    Добавление товара на склад
+    :param nameUser:
+    :return:
+    """
+    with open('DataSklad.csv', 'a') as save:
+        try:
+            name = input("Введите наименование: ")
+            price = input("Введите стоимость: ")
+            amount = input("Введите количество: ")
+        except:
+            print("Введите название корректно")
+            AddDataSklad(nameUser)
+        save.write(f"{name},{price},{amount}")
+        print("Успешно!")
+        save.close()
+        AdminMenu(nameUser)
+
+
+def AddUser(nameUser):
+    """
+    Добавление пользователя
+    :param nameUser:
+    :return:
+    """
+    with open('UserBase.csv', 'a') as save:
+        try:
+            userLogin = input("Введите логин: ")
+            userPassword = input("Введите пароль: ")
+            userRole = input("Введите роль пользователя: ")
+        except:
+            print("Введите название без символов")
+        save.write(f"{userLogin},{userPassword},{userRole}")
+        print("Успешно!")
+        save.close()
+        AdminMenu(nameUser)
+
+
+def DelUser(nameUser):
+    """
+    Удаление пльзователя
+    :param nameUser:
+    :return:
+    """
+    userData = 'UserBase.csv'
+    try:
+        with open(userData) as save:
+            csvRead = csv.reader(save)
+            i = 1
+            baseList = {}
+            delUser = int(input("Введите ключ строки для удаления пользователя: "))
+            for base in csvRead:
+                tablBase = base[0], base[1], base[2]
+                baseList[i] = (tablBase)
+                i += 1
+            baseList.pop(delUser)
+            user = []
+            for key, value in baseList.items():
+                for i in value:
+                    user.append(i)
+        j = 0
+        with open(userData, "w") as save:
+            for i in user:
+                if j == 2:
+                    save.write(f"{i}\n")
+                    j = 0
+                    continue
+                else:
+                    save.write(f"{i},")
+                j += 1
+        AdminMenu(nameUser)
+        print("Успешно!")
+    except Exception as error:
+        print(error)
+        print("Файл отсутствует")
+
+
+def DelBase(nameUser):
+    """
+    Удаление товара из базы
+    :param nameUser:
+    :return:
+    """
+    userData = 'DataSklad.csv'
+    try:
+        with open(userData) as save:
+            csvRead = csv.reader(save)
+            i = 1
+            baseList = {}
+            delUser = int(input("Введите ключ строки для удаления товар: "))
+            for base in csvRead:
+                tablBase = base[0], base[1], base[2]
+                baseList[i] = (tablBase)
+                i += 1
+            baseList.pop(delUser)
+            user = []
+            for key, value in baseList.items():
+                for i in value:
+                    user.append(i)
+        j = 0
+        with open(userData, "w") as save:
+            for i in user:
+                if j == 2:
+                    save.write(f"{i}\n")
+                    j = 0
+                    continue
+                else:
+                    save.write(f"{i},")
+                j += 1
+        print("Успешно!")
+        AdminMenu(nameUser)
+    except Exception as error:
+        print(error)
+        print("Файл отсутствует")
+
+
+if __name__ == "__main__":
+    MainMenu()
