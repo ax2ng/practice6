@@ -1,0 +1,71 @@
+# В анкетах сотрудников некоторого учреждения имеются следующие сведения:
+# фамилия, год рождения, должность (мастер, инженер, рабочий и т.д.), стаж, образование.
+# Вывести фамилии мастеров с высшим образованием и вычислить их средний стаж.
+# Выполнить сортировку списка. ВАРИАНТ 4
+
+from tabulate import tabulate
+import csv
+
+
+def csv(headers: list, data: list):
+    """
+    Записывает данные в CSV файл и выводит
+    структурированные данные, введенные пользователем
+
+    :param headers: - Заголовки выводимой таблицы
+    :param data: - Пользовательские данные
+    """
+    print(tabulate(data,headers,tablefmt="таблица"))
+    text = ""
+    for i in data:
+        text += ','.join(map(str, i)) + '\n' #делает строку, джойним запятые в итерируемый объект
+    open('file.csv', 'w').write(text)
+
+def worker(num: int) -> tuple:
+    """
+    Функцоя которая создает работника
+
+    :param num:
+    :return tuple:
+    """
+    print("Работник №",num,sep="")
+    surname = input("Фамилия: ")
+    year = input("Год рождения: ")
+    dolj = input("Должность: ")
+    while True:
+        try:
+            staj = int(input("Стаж: "))
+            break
+        except:
+            pass
+    obr = input("Образование: ")
+    return (surname,year,dolj,staj,obr)
+
+def start():
+    while True:
+        try:
+            count = int(input("Количество работников: "))
+            break
+        except:
+            pass
+
+    workers = []
+    vysh_obr = []
+    for i in range(count):
+        workers.append(worker(i+1))
+
+    for i in workers:
+        if i[4].lower() == "высшее" and i[2].lower() == "мастер":
+            vysh_obr.append(i)
+    try:
+        print("Средний стаж работников с высшим: ", sum([i[3] for i in vysh_obr]) / len(vysh_obr))
+    except:
+        pass
+
+    print("\nСортировка по стажу:")
+    csv(["Фамилия", "Год рождения", "Должность", "Стаж", "Образование"], sorted(workers, key=lambda x: x[3], reverse=True))
+    #  лямбда функции нужна для того, чтобы фильровать по третьему элементу
+
+
+if __name__ == "__main__":
+    start()
